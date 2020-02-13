@@ -6,9 +6,15 @@ import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -34,18 +40,6 @@ public class Ventana extends JFrame {
 		crearMenu();
 	}
 
-	private void crearTexto() {
-		areaTexto = new JTextArea("");
-		areaTexto.setForeground(Color.green);
-		areaTexto.setBackground(Color.black);
-		areaTexto.setWrapStyleWord(true);
-		areaTexto.setLineWrap(true);
-		JScrollPane scroll = new JScrollPane();
-		scroll.setViewportView(areaTexto);
-		getContentPane().add(scroll, BorderLayout.CENTER);
-		revalidate();
-		
-	}
 
 	private void crearMenu() {
 		
@@ -138,8 +132,75 @@ public class Ventana extends JFrame {
 	protected void abrir() {
 		// Metodo para abrir archivos
 		
+		// Creamos el selector de archivos
+		JFileChooser fileChooser = new JFileChooser();
+		int seleccion = fileChooser.showOpenDialog(areaTexto);
+		// Si seleccionamos un archivo
+		if (seleccion == JFileChooser.APPROVE_OPTION) {
+		   File fichero = fileChooser.getSelectedFile(); 
+		   // Cambiamos el título a la ruta del archivo elegido
+		   setTitle(fichero.getAbsolutePath());
+		   try {
+			// Creamos un lector de archivos
+			BufferedReader reader = new BufferedReader(new FileReader(fichero));
+			// Inicializamos la variable linea a null
+			String linea = null;
+			try {
+				// Guardamos lo recuperado por el lector en la variable linea
+				linea = reader.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// Si linea es distinto de nulo 
+			while (linea != null) {
+			   // Sacamos por pantalla la linea leida
+			   areaTexto.append(linea);
+			   // Hacemos un salto de linea
+			   areaTexto.append(System.getProperty("line.separator"));
+			   try {
+				   // Leemos otra linea más
+				   linea = reader.readLine();
+			   } catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
+			try {
+				// Cuando termine el WHILE cerramos el archivo
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Archivo no encontrado");
+		}
+		      
+		   
+		}
+		
+		
 	}
 
+	private void setTitle(int seleccion) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private void crearTexto() {
+		areaTexto = new JTextArea("");
+		areaTexto.setForeground(Color.GREEN);
+		areaTexto.setBackground(Color.BLACK);
+		areaTexto.setWrapStyleWord(true);
+		areaTexto.setCaretColor(Color.MAGENTA);
+		areaTexto.setLineWrap(true);
+		JScrollPane scroll = new JScrollPane();
+		scroll.setViewportView(areaTexto);
+		getContentPane().add(scroll, BorderLayout.CENTER);
+		revalidate();
+		
+	}
+	
+	
 	protected void nuevoArchivo() {
 		
 		if (areaTexto != null) {
